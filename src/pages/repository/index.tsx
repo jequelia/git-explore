@@ -9,7 +9,7 @@ interface RepositoryParam{
     repository: string;
 }
 
-interface Repository{
+interface RepositoryInterface{
     repository: string;
     full_name: string;
     description: string;
@@ -33,9 +33,9 @@ interface  Issue{
 
 }
 
-const Repository: React.FC = () => {
+const Repository: React.FunctionComponent = () => {
 
-    const [ repository, setRepository] = useState<Repository | null>(null);
+    const [ repository, setRepository] = useState<RepositoryInterface | null>(null);
     const [ issues, setIssues] = useState<Issue[]>([]);
     const {params} = useRouteMatch<RepositoryParam>();
 
@@ -77,7 +77,7 @@ const Repository: React.FC = () => {
                 <Link to="/"> <FiChevronLeft size={30}/>Voltar</Link>
             </Header>
 
-            {Repository && (
+            { (
                  <InfoRepo>
                  <header>
                      <img 

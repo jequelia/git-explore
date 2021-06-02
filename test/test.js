@@ -8,8 +8,6 @@ test('usuario/repository existente', async t => {
         .typeText('#input-search', 'DevExpress/testcafe')
         .click('#button-submit')
         .expect(Selector('.Toastify').innerText).eql('adicionado com sucesso');;
-
-
 });
 
 
@@ -19,18 +17,14 @@ test('usuario/repository não existente', async t => {
         .typeText('#input-search', 'DevExpress/selenium')
         .click('#button-submit')
         .expect(Selector('.Toastify').innerText).eql('deu erro');;
-
-
 });
 
 test('usuario/repository duplicado', async t => {
     await t
-        .typeText('#input-search', 'DevExpress/selenium')
+        .typeText('#input-search', 'jequelia/git-explore')
         .click('#button-submit')
-        .typeText('#input-search', 'DevExpress/selenium')
-        .click('#button-submit').expect(Selector('.Toastify').innerText).eql('');
-
-
+        .typeText('#input-search', 'jequelia/git-explore')
+        .click('#button-submit').expect(Selector('.Toastify').innerText).eql('Repositorio já existente');
 });
 
 

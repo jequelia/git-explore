@@ -1,126 +1,121 @@
-import React, { useState, useEffect } from 'react';
-import {Header, InfoRepo, Issues} from './style'
-import Logo from '../../assests/logo-github.svg'
-import {Link, useRouteMatch} from 'react-router-dom';
-import {FiChevronLeft, FiChevronRight} from 'react-icons/fi'
-import api from '../../services/api';
+import React, { useState, useEffect } from "react";
+import { Header, InfoRepo, Issues } from "./style";
+import Logo from "../../assests/logo-github.svg";
+import { Link, useRouteMatch } from "react-router-dom";
+import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import api from "../../services/api";
 
-interface RepositoryParam{
-    repository: string;
+interface RepositoryParam {
+  repository: string;
 }
 
-interface Repository{
-    repository: string;
-    full_name: string;
-    description: string;
-    forks_count: number;
-    stargazers_count: number;
-    open_issues_count: number;
+interface Repository {
+  repository: string;
+  full_name: string;
+  description: string;
+  forks_count: number;
+  stargazers_count: number;
+  open_issues_count: number;
 
-    owner:{
-        login: string;
-        avatar_url: string;
-    }
+  owner: {
+    login: string;
+    avatar_url: string;
+  };
 }
 
-interface  Issue{
-    id: number,
-    title: string,
-    html_url: string,
-    user:{
-        login: string,
-    }
-
+interface Issue {
+  id: number;
+  title: string;
+  html_url: string;
+  user: {
+    login: string;
+  };
 }
 
-const Repository: React.FC = () => {
+const Repository: React.FunctionComponent = () => {
+  const [repository, setRepository] = useState<Repository | null>(null);
+  const [issues, setIssues] = useState<Issue[]>([]);
+  const { params } = useRouteMatch<RepositoryParam>();
 
-    const [ repository, setRepository] = useState<Repository | null>(null);
-    const [ issues, setIssues] = useState<Issue[]>([]);
-    const {params} = useRouteMatch<RepositoryParam>();
+  useEffect(() => {
+    api.get(`repos/${params.repository}`).then((response) => {
+      console.log(response.data);
+      setRepository(response.data);
+    });
 
-    useEffect(()=>{
+    api.get(`repos/${params.repository}/issues`).then((response) => {
+      console.log(response.data);
+      setIssues(response.data);
+    });
 
-        api.get(`repos/${params.repository}`).then(
-            response => {
-                console.log(response.data);
-                setRepository(response.data);
-            }
-        )
+    // async function loadData(): Promise<void> {
+    //     const [ repository, issues] = await Promise.all([
+    //         api.get(`repos/${params.repository}`),
+    //         api.get(`repos/${params.repository}/issues`)
+    //     ])
 
-        api.get(`repos/${params.repository}/issues`).then(
-            response => {
-                console.log(response.data);
-                setIssues(response.data)
-            }
-        )
+    //     console.log('repository', repository);
+    //     console.log('issues', issues.data);
 
-        // async function loadData(): Promise<void> {
-        //     const [ repository, issues] = await Promise.all([
-        //         api.get(`repos/${params.repository}`),
-        //         api.get(`repos/${params.repository}/issues`)
-        //     ])
+    // }
 
-        //     console.log('repository', repository);
-        //     console.log('issues', issues.data);
-            
-        // }
+    // loadData()
+  }, [params.repository]);
 
-        // loadData()
+  return (
+    <>
+      <Header>
+        <img src={Logo} alt="Logo App" />
+        <Link to="/">
+          {" "}
+          <FiChevronLeft size={30} />
+          Voltar
+        </Link>
+      </Header>
 
-    }, [params.repository])
+      {
+        <InfoRepo>
+          <header>
+            <img
+              src={repository?.owner.avatar_url}
+              alt={repository?.full_name}
+            />
+            <div>
+              <strong>{repository?.full_name}</strong>
+              <p>{repository?.description}</p>
+            </div>
+          </header>
 
-    return (
-        <>
-            <Header>
-                <img src={Logo} alt="Logo App"/>
-                <Link to="/"> <FiChevronLeft size={30}/>Voltar</Link>
-            </Header>
+          <ul>
+            <li>
+              <strong>{repository?.stargazers_count}</strong>
+              <span>Start</span>
+            </li>
+            <li>
+              <strong>{repository?.forks_count}</strong>
+              <span>Forks</span>
+            </li>
+            <li>
+              <strong>{repository?.open_issues_count}</strong>
+              <span>Issues abertas</span>
+            </li>
+          </ul>
+        </InfoRepo>
+      }
 
-            {Repository && (
-                 <InfoRepo>
-                 <header>
-                     <img 
-                         src={repository?.owner.avatar_url}
-                         alt={repository?.full_name}
-                     />
-                     <div>
-                         <strong>{repository?.full_name}</strong>
-                         <p>{repository?.description}</p>
-                     </div>
-                 </header>
-               
-                 <ul>
-                     <li>
-                         <strong>{repository?.stargazers_count}</strong>
-                         <span>Start</span>
-                     </li>
-                     <li>
-                         <strong>{repository?.forks_count}</strong>
-                         <span>Forks</span>
-                     </li>
-                     <li>
-                         <strong>{repository?.open_issues_count}</strong>
-                         <span>Issues abertas</span>
-                     </li>
-                 </ul>
-             </InfoRepo>
-            )}
-           
-            <Issues>
-                {issues.map( issue =>(
-                     <a key={issue.id} href={issue.html_url}>
-                     <div>
-                         <strong>{issue.title}</strong>
-                         <p>{issue.user.login}</p>
-                     </div>
-                     <FiChevronRight size={40}></FiChevronRight>
-                     </a>
-                ))}
-            </Issues>
-            
-        </>
-    );
-}
+      <Issues>
+        {issues.map((issue) => (
+          <a key={issue.id} href={issue.html_url}>
+            <div>
+              <strong>{issue.title}</strong>
+              <p>{issue.user.login}</p>
+            </div>
+            <FiChevronRight size={40}></FiChevronRight>
+          </a>
+        ))}
+      </Issues>
+    </>
+  );
+};
 
 export default Repository;
